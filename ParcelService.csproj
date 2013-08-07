@@ -46,6 +46,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="7Zip\Artifacts\test.deploy.cmd" />
+    <None Include="7Zip\build_deploy_file.bat" />
+    <None Include="7Zip\extract_deploy_file.bat" />
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>

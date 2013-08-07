@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Timers;
 using Config = System.Configuration.ConfigurationManager;
 
 namespace Asp.Net.WebDeployer
@@ -35,15 +34,17 @@ namespace Asp.Net.WebDeployer
 
 					// rename the file!
 					var directoryName = Path.GetDirectoryName(file);
-					var extension = Path.GetExtension(file);
-					var temporaryFile = string.Concat(temporaryFileName, extension);
 
 					Debug.Assert(directoryName != null, "directoryName != null");
-					var tempFile = Path.Combine(directoryName, temporaryFile);
+					var tempFile = Path.Combine(directoryName, temporaryFileName);
+					if (File.Exists(tempFile))
+						File.Delete(tempFile);
+
 					File.Move(file, tempFile);
 
 					ExtractFiles(tempFile, temporaryDirectory);
 					DeployWebSite(temporaryDirectory);
+
 					File.Delete(tempFile);
 				}
 
@@ -55,10 +56,10 @@ namespace Asp.Net.WebDeployer
 
 		private static string[] GetFiles()
 		{
-			if (!Directory.Exists(DirectoryToWatch))
-				return new string[0];
-
-			return Directory.GetFiles(DirectoryToWatch, PatternToWatchFor);
+			var directoryToWatch = DirectoryToWatch;
+			return Directory.Exists(directoryToWatch) ? 
+				Directory.GetFiles(directoryToWatch, Config.AppSettings[PatternToWatchForToken]) : 
+				new string[0];
 		}
 
 		private static void ExtractFiles(string fileName, string extractToDirectory)
@@ -92,11 +93,5 @@ namespace Asp.Net.WebDeployer
 		{
 			get { return Config.AppSettings[DirectoryToWatchToken]; }
 		}
-
-		private static string PatternToWatchFor
-		{
-			get { return Config.AppSettings[PatternToWatchForToken]; }
-		}
-
 	}
 }
